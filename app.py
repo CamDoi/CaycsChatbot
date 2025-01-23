@@ -45,4 +45,5 @@ def chat():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Ensure the app runs securely if hosted locally
+    app.run(ssl_context='adhoc', debug=True)
