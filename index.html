@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doi's Question Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu" onclick="toggleMenu()">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav id="menu" class="hidden">
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Doi's Question Bot</h1>
+        <div class="form-section">
+            <div class="input-container">
+                <label for="user_input">User Input</label>
+                <textarea id="user_input" rows="3" onkeydown="checkEnter(event)" placeholder="HEROOOOO ask ANYTHING!!!"></textarea>
+            </div>
+            <div class="output-container">
+                <label for="output">Output</label>
+                <textarea id="output" rows="3" readonly></textarea>
+            </div>
+        </div>
+        <div class="buttons">
+            <button class="submit-btn" onclick="sendMessage()">Submit</button>
+            <button class="clear-btn" onclick="clearInput()">Clear</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle hamburger menu visibility
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Check for the Enter key press
+        function checkEnter(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault(); // Prevent adding a new line
+                sendMessage(); // Trigger the sendMessage function
+            }
+        }
+
+        // Send message to the backend and display the response
+        async function sendMessage() {
+            const userInput = document.getElementById("user_input").value;
+
+            // Clear output and show processing message
+            const outputBox = document.getElementById("output");
+            outputBox.value = "Processing...";
+
+            try {
+                const response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ user_input: userInput }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    outputBox.value = data.response; // Display the response
+                } else {
+                    outputBox.value = "Error: " + (data.error || "Something went wrong");
+                }
+            } catch (error) {
+                outputBox.value = "Error: Unable to reach the server";
+            }
+        }
+
+        // Clear input and output
+        function clearInput() {
+            document.getElementById('user_input').value = '';
+            document.getElementById('output').value = '';
+        }
+    </script>
+</body>
+</html>
