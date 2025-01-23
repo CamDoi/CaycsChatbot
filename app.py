@@ -21,12 +21,16 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "HEAD"])
 def home():
-    logging.debug("Home route accessed")
+    logging.debug(f"Home route accessed with method: {request.method}")
     if request.method == "HEAD":
         # Respond with only headers for HEAD requests
         return "", 200
-    # Render the template for GET requests
-    return render_template("index.html"), 200
+    try:
+        # Render the template for GET requests
+        return render_template("index.html"), 200
+    except Exception as e:
+        logging.error(f"Error rendering template: {str(e)}")
+        return "Error loading the homepage", 500
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
