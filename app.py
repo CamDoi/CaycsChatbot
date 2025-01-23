@@ -3,6 +3,7 @@ import openai
 from dotenv import load_dotenv
 import os
 import logging
+import traceback
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -30,7 +31,8 @@ def home():
         return render_template("index.html"), 200
     except Exception as e:
         logging.error(f"Error rendering template: {str(e)}")
-        return "Error loading the homepage", 500
+        logging.error(traceback.format_exc())  # Add traceback for detailed debugging
+        return ("Error loading the homepage. Please contact support.", 500)
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
