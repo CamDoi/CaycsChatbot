@@ -20,6 +20,13 @@ logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
+# Redirect HTTP to HTTPS (for production, this is better handled by a reverse proxy like Nginx)
+@app.before_request
+def redirect_to_https():
+    if not request.is_secure and app.env != "development":
+        url = request.url.replace("http://", "https://", 1)
+        return jsonify({"error": "Please use HTTPS."}), 403
+
 @app.route("/", methods=["GET", "HEAD"])
 def home():
     logging.debug(f"Home route accessed with method: {request.method}")
@@ -63,4 +70,11 @@ def chat():
 
 if __name__ == "__main__":
     # Ensure the app runs securely if hosted locally
-    app.run(debug=True)
+    # Specify paths to your SSL certificate and private key
+    ssl_context = ('path/to/cert.pem', 'path/to/key.pem')  # Replace with actual file paths
+
+    try:
+        app.run(debug=True, ssl_context=ssl_context)  # HTTPS enabled
+    except Exception as e:
+        logging.error("Error starting the application with SSL context.")
+        logging.error(traceback.format_exc())
