@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import openai
 from dotenv import load_dotenv
 import os
+import logging
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -13,11 +14,15 @@ if not api_key:
 
 openai.api_key = api_key
 
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET", "HEAD"])
 def home():
-    return render_template("index.html")
+    logging.debug("Home route accessed")
+    return render_template("index.html"), 200
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
@@ -42,7 +47,9 @@ def chat():
         # Return the response as JSON
         return jsonify({"response": assistant_response})
     except Exception as e:
+        logging.error(f"Error in chat endpoint: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
+    # Ensure the app runs securely if hosted locally
     app.run(debug=True)
