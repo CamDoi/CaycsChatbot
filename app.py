@@ -23,6 +23,7 @@ app = Flask(__name__)
 @app.route("/", methods=["GET", "HEAD"])
 def home():
     logging.debug(f"Home route accessed with method: {request.method}")
+    logging.debug(f"Template folder: {app.template_folder}")
     if request.method == "HEAD":
         # Respond with only headers for HEAD requests
         return "", 200
@@ -31,7 +32,7 @@ def home():
         return render_template("index.html"), 200
     except Exception as e:
         logging.error(f"Error rendering template: {str(e)}")
-        logging.error(traceback.format_exc())  # Add traceback for detailed debugging
+        logging.error(traceback.format_exc())
         return ("Error loading the homepage. Please contact support.", 500)
 
 @app.route("/api/chat", methods=["POST"])
